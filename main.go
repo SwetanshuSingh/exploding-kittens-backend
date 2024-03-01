@@ -43,7 +43,7 @@ func main() {
 	router.HandleFunc("/winGame/{username}", WinGame).Methods("POST")
 	router.HandleFunc("/leaderboard", GetLeaderBoard).Methods("GET")
 
-	allowedOrigins := handlers.AllowedOrigins([]string{"http://localhost:5173"})
+	allowedOrigins := handlers.AllowedOrigins([]string{"http://localhost:5173", "https://exploding-kittens-eight.vercel.app"})
 	allowedMethods := handlers.AllowedMethods([]string{"GET", "POST"})
 	allowedHeaders := handlers.AllowedHeaders([]string{"Content-Type"})
 
