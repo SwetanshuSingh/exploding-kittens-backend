@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
 	"os"
 
 	"github.com/go-redis/redis/v8"
@@ -86,13 +87,12 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-// WinGame increments the user's win count by 1
 func WinGame(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	username := params["username"]
 
-	// Increment user's win count
-	newWinCount, err := client.Incr(ctx, username).Result()
+	// Increment user's win count by 0.5
+	newWinCount, err := client.IncrByFloat(ctx, username, 0.5).Result()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -109,8 +109,8 @@ func WinGame(w http.ResponseWriter, r *http.Request) {
 }
 
 type UserScore struct {
-	Username string `json:"username"`
-	Score    int    `json:"score"`
+	Username string  `json:"username"`
+	Score    float32 `json:"score"`
 }
 
 func GetLeaderBoard(w http.ResponseWriter, r *http.Request) {
@@ -124,7 +124,7 @@ func GetLeaderBoard(w http.ResponseWriter, r *http.Request) {
 	// Retrieve data for each user
 	var usersData []UserScore
 	for _, key := range keys {
-		winCount, err := client.Get(ctx, key).Int()
+		winCount, err := client.Get(ctx, key).Float32()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
